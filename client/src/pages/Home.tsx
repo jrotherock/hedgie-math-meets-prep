@@ -6,6 +6,7 @@ import PracticeCalendar from "@/components/PracticeCalendar";
 import ScoreCard from "@/components/ScoreCard";
 import WeeklyReport from "@/components/WeeklyReport";
 import ProblemInterface from "@/components/ProblemInterface";
+import PracticeSession from "@/components/PracticeSession";
 import TeamRoleCard from "@/components/TeamRoleCard";
 import ProblemBankManager from "@/components/ProblemBankManager";
 import ParentDashboard from "@/components/ParentDashboard";
@@ -14,6 +15,7 @@ type ViewType = 'home' | 'practice' | 'calendar' | 'scores' | 'reports' | 'probl
 
 export default function Home() {
   const [currentView, setCurrentView] = useState<ViewType>('home');
+  const [selectedRoundType, setSelectedRoundType] = useState<'sprint' | 'target' | 'numbersense' | 'team' | null>(null);
   
   // todo: remove mock functionality
   const mockGoals = [
@@ -101,7 +103,10 @@ export default function Home() {
                       duration="10 min"
                       calcAllowed={false}
                       color="green"
-                      onClick={() => setCurrentView('practice')}
+                      onClick={() => {
+                        setSelectedRoundType('numbersense');
+                        setCurrentView('practice');
+                      }}
                     />
                     <RoundCard
                       title="Sprint"
@@ -109,7 +114,11 @@ export default function Home() {
                       duration="40 min"
                       calcAllowed={false}
                       color="orange"
-                      onClick={() => setCurrentView('practice')}
+                      onClick={() => {
+                        console.log('Sprint button clicked - setting roundType to sprint');
+                        setSelectedRoundType('sprint');
+                        setCurrentView('practice');
+                      }}
                     />
                     <RoundCard
                       title="Target"
@@ -117,7 +126,10 @@ export default function Home() {
                       duration="24 min"
                       calcAllowed={true}
                       color="blue"
-                      onClick={() => setCurrentView('practice')}
+                      onClick={() => {
+                        setSelectedRoundType('target');
+                        setCurrentView('practice');
+                      }}
                     />
                     <RoundCard
                       title="Team"
@@ -125,7 +137,10 @@ export default function Home() {
                       duration="20 min"
                       calcAllowed={true}
                       color="purple"
-                      onClick={() => setCurrentView('practice')}
+                      onClick={() => {
+                        setSelectedRoundType('team');
+                        setCurrentView('practice');
+                      }}
                     />
                   </div>
                 </div>
@@ -139,18 +154,27 @@ export default function Home() {
         );
         
       case 'practice':
+        if (!selectedRoundType) {
+          setCurrentView('home');
+          return null;
+        }
+        
+        console.log('Rendering PracticeSession with roundType:', selectedRoundType);
         return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Sprint — 40 min • -1 wrong • No Calc</h2>
-            </div>
-            <ProblemInterface
-              roundType="sprint"
-              problem={mockProblemMC}
-              onAnswer={(answer) => console.log('Answer:', answer)}
-              showHint={true}
-            />
-          </div>
+          <PracticeSession
+            studentId={"demo-student-id"} // In real app, get from auth context
+            roundType={selectedRoundType}
+            onComplete={(results) => {
+              console.log('Session completed:', results);
+              // Show results or redirect
+              setSelectedRoundType(null);
+              setCurrentView('home');
+            }}
+            onCancel={() => {
+              setSelectedRoundType(null);
+              setCurrentView('home');
+            }}
+          />
         );
         
       case 'calendar':

@@ -14,9 +14,10 @@ interface ProblemInterfaceProps {
   };
   onAnswer: (answer: string) => void;
   showHint?: boolean;
+  onHint?: () => void;
 }
 
-export default function ProblemInterface({ roundType, problem, onAnswer, showHint }: ProblemInterfaceProps) {
+export default function ProblemInterface({ roundType, problem, onAnswer, showHint, onHint }: ProblemInterfaceProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<string>('');
   const [numericalAnswer, setNumericalAnswer] = useState<string>('');
 
@@ -46,7 +47,7 @@ export default function ProblemInterface({ roundType, problem, onAnswer, showHin
                 variant="outline" 
                 size="sm" 
                 data-testid="button-hint"
-                onClick={() => console.log('Hint requested')}
+                onClick={onHint || (() => console.log('Hint requested'))}
               >
                 Hint
               </Button>
